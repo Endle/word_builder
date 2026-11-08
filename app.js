@@ -3,9 +3,21 @@ const $ = id => document.getElementById(id);
 let length = 5, activeQuery, matches = [], history = new Set(), historyKey = '', shown = [], excluded = new Set();
 const batchSize=18;
 function readQuery(){return {letters:$('letters').value,length,starts:$('starts').value,ends:$('ends').value,pattern:$('pattern').value,commonOnly:$('common-only').checked};}
-function solve(alternatives=false){
+let solving = false;
+async function solve(alternatives=false){
+  if (solving) return;
+  solving = true;
+  $('find-button').disabled = true;
+  $('alternatives').disabled = true;
+  $('results').setAttribute('aria-busy','true');
+  $('error').hidden = true;
+  const buttonLabel = $('find-button').innerHTML;
   try {
-    if (!Array.isArray(window.WORDS)) throw new Error('The dictionary could not load. Refresh the page to try again.');
+    if (!Array.isArray(window.WORDS)) {
+      $('find-button').textContent = 'Loading dictionary…';
+      $('result-summary').textContent = 'Loading the English dictionary…';
+    }
+    await loadWordDictionary();
     const q=WordSolver.validate(readQuery());
     const key=[...q.letters].sort().join('');
     if (key!==historyKey){history.clear();historyKey=key;}
@@ -14,7 +26,18 @@ function solve(alternatives=false){
     matches=WordSolver.search(WORDS,q,excluded,$('sort').value);
     $('error').hidden=true;
     render();
-  } catch(error){$('error').textContent=error.message;$('error').hidden=false;}
+  } catch(error){
+    $('error').textContent=error.message;$('error').hidden=false;
+    if (!Array.isArray(window.WORDS)) {
+      $('results-count').textContent='Not loaded';
+      $('result-summary').textContent='Tap Find words to retry the dictionary download.';
+    }
+  } finally {
+    solving=false;
+    $('find-button').disabled=false;
+    $('find-button').innerHTML=buttonLabel;
+    $('results').setAttribute('aria-busy','false');
+  }
 }
 function render(){
   shown=matches.slice(0,batchSize);

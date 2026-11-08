@@ -36,4 +36,14 @@ The pure solver tests cover letter multiplicity, combined constraints, validatio
 /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc tests/solver.test.js
 ```
 
-Files: `index.html` (semantic UI), `styles.css` (responsive design), `solver.js` (pure matching), `app.js` (page behavior), `assets/words.js` (dictionary).
+Files: `index.html` (semantic UI), `styles.css` (responsive design), `solver.js` (pure matching), `app.js` (page behavior), `dictionary-loader.js` (retryable dictionary loading), `assets/words.js` (dictionary).
+
+### Mobile dictionary loading
+
+The dictionary is stored as a JSON string and parsed with `JSON.parse`, avoiding a large nested JavaScript array literal. The page waits for loading, retries one failed request with a fresh URL, and allows another attempt via Find words. A 30-second timeout prevents an indefinitely pending download. The dataset remains bundled and requires no external dictionary API.
+
+Loader regression tests simulate success, download failures, missing data, retries, and concurrent requests:
+
+```sh
+/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc tests/dictionary-loader.test.js
+```
