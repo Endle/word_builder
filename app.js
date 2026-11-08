@@ -2,6 +2,7 @@
 const $ = id => document.getElementById(id);
 let length = 5, activeQuery, matches = [], history = new Set(), historyKey = '', shown = [], excluded = new Set();
 const batchSize=18;
+let dictionary=[];
 function readQuery(){return {letters:$('letters').value,length,starts:$('starts').value,ends:$('ends').value,pattern:$('pattern').value,commonOnly:$('common-only').checked};}
 let solving = false;
 async function solve(alternatives=false){
@@ -9,32 +10,34 @@ async function solve(alternatives=false){
   solving = true;
   $('find-button').disabled = true;
   $('alternatives').disabled = true;
+  $('reset').disabled = $('sort').disabled = $('history-reset').disabled = true;
   $('results').setAttribute('aria-busy','true');
   $('error').hidden = true;
   const buttonLabel = $('find-button').innerHTML;
   try {
-    if (!Array.isArray(window.WORDS)) {
-      $('find-button').textContent = 'Loading dictionary…';
-      $('result-summary').textContent = 'Loading the English dictionary…';
-    }
-    await loadWordDictionary();
     const q=WordSolver.validate(readQuery());
+    $('find-button').textContent = 'Loading words…';
+    const wordLength=q.length || q.pattern.length;
+    const lengths=wordLength ? [wordLength] : Array.from({length:Math.min(15,q.letters.length)-1},(_,i)=>i+2);
+    dictionary=await loadWordDictionary(lengths);
     const key=[...q.letters].sort().join('');
     if (key!==historyKey){history.clear();historyKey=key;}
     excluded=alternatives ? new Set(history) : new Set();
     activeQuery=q;
-    matches=WordSolver.search(WORDS,q,excluded,$('sort').value);
+    matches=WordSolver.search(dictionary,q,excluded,$('sort').value);
     $('error').hidden=true;
     render();
   } catch(error){
     $('error').textContent=error.message;$('error').hidden=false;
-    if (!Array.isArray(window.WORDS)) {
+    if (error.dictionaryLoad) {
       $('results-count').textContent='Not loaded';
       $('result-summary').textContent='Tap Find words to retry the dictionary download.';
     }
   } finally {
     solving=false;
     $('find-button').disabled=false;
+    $('reset').disabled = $('sort').disabled = $('history-reset').disabled = false;
+    if (activeQuery) $('alternatives').disabled=!WordSolver.search(dictionary,activeQuery,history,$('sort').value).length;
     $('find-button').innerHTML=buttonLabel;
     $('results').setAttribute('aria-busy','false');
   }
@@ -60,7 +63,7 @@ function render(){
     card.append(text,meta,copy);grid.append(card);
   }
   $('shown-summary').textContent=shown.length?'Showing '+shown.length+' of '+matches.length+' matches':'Try another combination.';
-  const remaining=WordSolver.search(WORDS,activeQuery,history,$('sort').value).length;
+  const remaining=WordSolver.search(dictionary,activeQuery,history,$('sort').value).length;
   $('alternatives').disabled=!remaining;$('alternatives').title=remaining?remaining+' unseen words remain':'No unseen words remain for these filters';
   $('history-reset').hidden=excluded.size===0;
 }
@@ -69,7 +72,7 @@ $('letters').addEventListener('input',()=>{$('letter-count').textContent=($('let
 $('length-options').addEventListener('click',event=>{const button=event.target.closest('button[data-length]');if(!button)return;length=Number(button.dataset.length);$('other-length').value='';updateLength();});
 function updateLength(){document.querySelectorAll('[data-length]').forEach(button=>{const active=Number(button.dataset.length)===length;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active));});}
 $('other-length').addEventListener('change',()=>{if($('other-length').value){length=Number($('other-length').value);updateLength();}});
-$('sort').addEventListener('change',()=>{if(activeQuery){matches=WordSolver.search(WORDS,activeQuery,excluded,$('sort').value);render();}});
+$('sort').addEventListener('change',()=>{if(activeQuery){matches=WordSolver.search(dictionary,activeQuery,excluded,$('sort').value);render();}});
 $('alternatives').addEventListener('click',()=>solve(true));
 $('history-reset').addEventListener('click',()=>{history.clear();solve();});
 $('reset').addEventListener('click',()=>{$('puzzle-form').reset();$('letters').value='';$('letter-count').textContent='0 letters';length=5;updateLength();history.clear();historyKey='';$('error').hidden=true;$('results').replaceChildren();$('results').setAttribute('aria-busy','false');$('results-count').textContent='Ready';$('result-summary').textContent='Your next word starts here.';$('shown-summary').textContent='Enter letters to get started.';$('alternatives').disabled=true;$('history-reset').hidden=true;activeQuery=null;$('letters').focus();});

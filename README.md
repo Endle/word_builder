@@ -4,7 +4,7 @@ A responsive, static English word-puzzle helper. No build step, account, API key
 
 ## Run
 
-Open `index.html` directly in a browser, or serve this directory:
+Serve this directory (dictionary JSON downloads require HTTP or HTTPS):
 
 ```sh
 python3 -m http.server 8000 --bind 0.0.0.0
@@ -24,9 +24,9 @@ On your computer, open `http://localhost:8000`. On a phone connected to the same
 
 ## Data and privacy
 
-`assets/words.js` bundles 168,551 ENABLE entries of 2–15 letters. Matching never generates words. FrequencyWords ranks prioritize familiar terms, but frequency is only an estimate and puzzle dictionaries may accept different words. Obscure entries remain available unless common-only is selected. See `THIRD_PARTY_NOTICES.txt` for data sources and licenses.
+`assets/words-2.json` through `assets/words-15.json` bundle 168,551 ENABLE entries of 2–15 letters. Matching never generates words. FrequencyWords ranks prioritize familiar terms, but frequency is only an estimate and puzzle dictionaries may accept different words. Obscure entries remain available unless common-only is selected. See `THIRD_PARTY_NOTICES.txt` for data sources and licenses.
 
-All matching and suggestion history stay in browser memory. Google Fonts is the only optional external request; system sans-serif fallbacks work offline. There is no analytics or persistence. The site does not require a service worker, so initial offline access requires local files or a locally running server.
+All matching and suggestion history stay in browser memory. Google Fonts is the only optional external request; system sans-serif fallbacks work offline. There is no analytics or persistence. The site does not require a service worker, so offline access requires a locally running server.
 
 ## Verification
 
@@ -36,13 +36,15 @@ The pure solver tests cover letter multiplicity, combined constraints, validatio
 /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc tests/solver.test.js
 ```
 
-Files: `index.html` (semantic UI), `styles.css` (responsive design), `solver.js` (pure matching), `app.js` (page behavior), `dictionary-loader.js` (retryable dictionary loading), `assets/words.js` (dictionary).
+Files: `index.html` (semantic UI), `styles.css` (responsive design), `solver.js` (pure matching), `app.js` (page behavior), `dictionary-loader.js` (retryable dictionary loading), `assets/words-*.json` (dictionary by length).
 
 ### Mobile dictionary loading
 
-The dictionary is stored as a JSON string and parsed with `JSON.parse`, avoiding a large nested JavaScript array literal. The page waits for loading, retries one failed request with a fresh URL, and allows another attempt via Find words. A 30-second timeout prevents an indefinitely pending download. The dataset remains bundled and requires no external dictionary API.
+The dictionary is split into JSON files by word length, downloaded with `fetch` only when needed. The default five-letter search transfers about 117 KB instead of loading a multi-megabyte JavaScript program. Any-length searches load only lengths possible with the supplied letters; a full pattern narrows this further. Successful downloads are cached in memory and concurrent requests share a download.
 
-Loader regression tests simulate success, download failures, missing data, retries, and concurrent requests:
+Each file gets a 20-second timeout and one automatic retry with cache bypass. Errors distinguish network failures, HTTP statuses, timeouts, malformed JSON, and invalid entries. Find words can retry after failure. There is no external dictionary API.
+
+Loader regression tests cover actual JSON files, caching, HTTP errors, malformed data, retries, timeouts, and concurrent requests:
 
 ```sh
 /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc tests/dictionary-loader.test.js

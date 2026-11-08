@@ -13,9 +13,13 @@ assert(WordSolver.search(dictionary,{...query,length:0,pattern:'_r___'})[0][0]==
 for(const bad of [{...query,letters:'12'}, {...query,pattern:'___'}, {...query,starts:'a',pattern:'b____'}, {...query,starts:'zz'}, {...query,length:7,letters:'cat'}]){
  let rejected=false;try{WordSolver.validate(bad);}catch(e){rejected=true;}assert(rejected,'Reject invalid or conflicting input');
 }
-var window={};load('assets/words.js');
-assert(window.WORDS.length>150000,'Full dictionary is bundled');
-const real=WordSolver.search(window.WORDS,query);
+const allWords=[];
+for(let n=2;n<=15;n++){const entries=JSON.parse(readFile('assets/words-'+n+'.json'));assert(entries.every(e=>e[0].length===n),'Shard contains only its declared word length');allWords.push(...entries);}
+assert(allWords.length>150000,'Full dictionary is bundled');
+const real=WordSolver.search(allWords,query);
 assert(real.some(e=>e[0]==='train'),'Real dictionary includes train');
 for(const [word] of real){const letters=[...query.letters.toLowerCase()];for(const ch of word){const index=letters.indexOf(ch);assert(index>=0,'Dictionary result respects letter counts');letters.splice(index,1);}}
-print('All solver regression tests passed; '+window.WORDS.length+' dictionary entries; '+real.length+' sample matches.');
+print('All solver regression tests passed; '+allWords.length+' dictionary entries; '+real.length+' sample matches.');
+
+const short=WordSolver.search(allWords,{letters:'opntio',length:3});
+assert(['pit','pot'].every(w=>short.some(e=>e[0]===w)),'OPNTIO includes PIT and POT');

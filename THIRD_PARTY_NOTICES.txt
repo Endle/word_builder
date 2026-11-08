@@ -8,7 +8,7 @@ English 2018 frequency list, based on OpenSubtitles data. Ranks are used only fo
 The frequency-list content is licensed CC BY-SA 4.0.
 Attribution: Hermit Dave, FrequencyWords (2018 English list), derived from OpenSubtitles2018.
 The bundled frequency ranks are an adaptation: occurrence counts were converted to ordinal ranks, joined to ENABLE, and filtered by length.
-The derived dataset in assets/words.js is distributed under CC BY-SA 4.0:
+The derived dataset in assets/words-*.json is distributed under CC BY-SA 4.0:
 https://creativecommons.org/licenses/by-sa/4.0/
 License declaration: https://github.com/hermitdave/FrequencyWords#license
 Source corpus: http://opus.nlpl.eu/OpenSubtitles2018.php
