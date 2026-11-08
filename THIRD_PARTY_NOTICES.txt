@@ -1,0 +1,38 @@
+ENABLE English word list
+Source: https://github.com/dolph/dictionary/blob/master/enable1.txt
+ENABLE is a public-domain word list. Bundled entries are limited to 2–15 letters.
+
+Frequency ranking
+Source: https://github.com/hermitdave/FrequencyWords/blob/master/content/2018/en/en_50k.txt
+English 2018 frequency list, based on OpenSubtitles data. Ranks are used only for words also present in ENABLE. Common means rank <= 15000.
+The frequency-list content is licensed CC BY-SA 4.0.
+Attribution: Hermit Dave, FrequencyWords (2018 English list), derived from OpenSubtitles2018.
+The bundled frequency ranks are an adaptation: occurrence counts were converted to ordinal ranks, joined to ENABLE, and filtered by length.
+The derived dataset in assets/words.js is distributed under CC BY-SA 4.0:
+https://creativecommons.org/licenses/by-sa/4.0/
+License declaration: https://github.com/hermitdave/FrequencyWords#license
+Source corpus: http://opus.nlpl.eu/OpenSubtitles2018.php
+
+The upstream code license (MIT) follows:
+
+MIT License
+
+Copyright (c) 2016 Hermit Dave
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
