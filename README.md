@@ -15,7 +15,8 @@ On your computer, open `http://localhost:8000`. On a phone connected to the same
 ## Features
 
 - Enter 2–20 letters, preserving repeated-letter counts.
-- Exact lengths from 2–15 letters, or Any (2–15).
+- Exact lengths from 2–15 letters, or Any (2–15). Quick buttons include 3–7 letters. Changing length refreshes results automatically; rapid changes use the latest selection.
+- On phones, fixed Puzzle / Results buttons switch between the two views. Find words opens Results; desktop keeps both panels visible.
 - Starting/ending sequences and a full positional pattern (`_` or `?` for unknowns).
 - Frequency ranking, alphabetical/length sorting, and a common-only filter.
 - Eighteen suggestions per batch. Alternatives exclude all suggestions already displayed for the same letter multiset during this page visit. A normal search can show earlier matches again; alternatives will still exclude them. Reset clears history.
@@ -49,3 +50,10 @@ Loader regression tests cover actual JSON files, caching, HTTP errors, malformed
 ```sh
 /System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc tests/dictionary-loader.test.js
 ```
+
+Page interaction tests cover automatic length changes, changes during pending downloads, the three-letter PIT/POT example, and mobile view switching:
+
+```sh
+/System/Library/Frameworks/JavaScriptCore.framework/Versions/A/Helpers/jsc tests/app.test.js
+```
+These tests use DOM stand-ins; visual/device testing is still manual.
